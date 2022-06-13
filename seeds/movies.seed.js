@@ -1,7 +1,3 @@
-const mongoose = require('mongoose');
-const Movie = require('../models/Movie.model');
-const DB_NAME = "mongodb://localhost/lab-express-cinema";
-mongoose.connect(DB_NAME);
 
 // To insert in "seeds/movies.seed.js"
 
@@ -89,12 +85,20 @@ const movies = [
 ];
 
 // Add here the script that will be run to actually seed the database (feel free to refer to the previous lesson)
+const mongoose = require("mongoose")
+const Movie = require("../models/Movie.model")
 
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost/lab-express-cinema";
+mongoose
+.connect(MONGO_URI)
+.then((x) => {
+console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);
 Movie.create(movies)
-  .then(moviesFromDB => {
-    console.log(`Created ${moviesFromDB.length} movies`);
-
-    // Once created, close the DB connection
-    mongoose.connection.close();
-  })
-  .catch(err => console.log(`An error occurred while creating books from the DB: ${err}`));
+.then(movieAdded => {
+    console.log("Moves Added: ",movieAdded)
+})
+.catch(error => console.log("Error Movie seed: ",error))
+})
+.catch((err) => {
+console.error("Error connecting to mongo: ", err);
+}); 
